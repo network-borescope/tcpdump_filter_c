@@ -1,0 +1,7 @@
+*.o
+*.txt
+*.exe
+filter_C
+!pop_df_lat_lon.txt
+data
+python
