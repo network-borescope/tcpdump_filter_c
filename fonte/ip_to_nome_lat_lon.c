@@ -1,8 +1,8 @@
 #include "ip_to_nome_lat_lon.h"
 
-#define MAX_LINE_SZ 200
-#define MAX_NETS 8
-#define MAX_REDES 78
+#define MAX_LINE_SZ 1000
+#define MAX_NETS 20
+#define MAX_REDES 500
 
 rede cidrs[MAX_REDES];
 
@@ -96,7 +96,7 @@ rede site_from_ip_addr(int* addr){
     r.id = NULL;
     for (int i = 0; i < 4; i++) net_ip[i] = addr[i] & 255;
 
-    for (int i = 0; i < 78; i++) {
+    for (int i = 0; i < MAX_REDES; i++) {
       found = 1;
       for (int j = 0; j < 4; j++) {
         if ((net_ip[j] & cidrs[i].mask[j]) != cidrs[i].net[j]){
