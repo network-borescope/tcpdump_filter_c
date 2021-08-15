@@ -7,7 +7,7 @@
 #include <sys/stat.h> // mkdir
 int mkdir(const char *pathname, mode_t mode); // mkdir header
 
-#define MAX_LINE_SZ 2001
+#define MAX_LINE_SZ 32001
 #define BLANKS_PER_INDENT 4
 //#define CAPTURE_TIME 1
 
@@ -244,7 +244,16 @@ int get_ips_and_port(char *start, DataHandler *dados, char **lat_lon_id, char **
 		}
 		token = strtok(NULL, ".");
 	}
-    
+#if 1 // nunca pega a porta, filtra apenas o protocolo
+	if (dados->proto && proto_ports) {
+		strcpy(dados->port_dst, "0");
+		char **p;
+		for (p = proto_ports; n; p++, n--) {
+			if (strcmp(dados->proto, *p) == 0) return 1;
+		}
+	}
+	return 0;
+#else    
 	if (dados->port_dst && proto_ports) {
 		// concentra portas sem interesse na porta "0"
 		char proto_port[15];
@@ -261,8 +270,9 @@ int get_ips_and_port(char *start, DataHandler *dados, char **lat_lon_id, char **
 	else {
 		strcpy(dados->port_dst, "0");
 	}
-    
+
     return 1;
+#endif
 }
 
 int must_flush(DataHandler *dados, TimeHandler *t) {
@@ -421,7 +431,9 @@ int main(int argc, char *argv[]) {
 	char prev_key[MAX_KEY+1] = "";
 
 	//char *proto_ports[] = {"17:53", "6:53", "6:80"};
-	int n = 3; // quantidade de proto:port de interesse
+	//int n = 3; // quantidade de proto:port de interesse
+	char *protos[] = {"17", "6"};
+	int n = 2; // quantidade de proto de interesse
 
 	char *lat_lon_id[3];
 
@@ -469,7 +481,8 @@ int main(int argc, char *argv[]) {
 		else if (prev_key) {
 			if (inner == 1) {
 				//get_ips_and_port(start, dados, lat_lon_id, proto_ports, n);
-				if (get_ips_and_port(start, dados, lat_lon_id, NULL, n) && lat_lon_id[0]) {
+				//if (get_ips_and_port(start, dados, lat_lon_id, NULL, n) && lat_lon_id[0]) {
+				if (get_ips_and_port(start, dados, lat_lon_id, protos, n) && lat_lon_id[0]) {
 #if 0
 					check_key(dados, time, d, prev_key, lat_lon_id);
 #else
